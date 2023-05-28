@@ -1,1 +1,1 @@
-# big_data_kul_all_projects
+# Code for all the assignments.
