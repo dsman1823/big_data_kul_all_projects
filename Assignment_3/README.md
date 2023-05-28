@@ -1,0 +1,5 @@
+- Decision Tree using Spark.ipynb: Contains the necessary code to build a Decision Tree Classifier
+- Logistic Regression using Spark.ipynb: Contains the necessary code to build a Logistic Regression Classifier
+- Predicting incoming reviews with DTmodel.ipynb: Contains the code to classify incoming reviews from a streaming server using our DTmodel
+- Predicting incoming reviews with LRmodel.ipynb: Contains the code to classify incoming reviews from a streaming server using our LRmodel
+- steam_reviews.csv: Contains the collected historical set of reviews
