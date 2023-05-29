@@ -1,0 +1,117 @@
+
+//Section 4.3 top 10 streamers based on average views
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 10
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Section 4.3 top 10 games by the amount of streamers
+MATCH (g:game)<-[PLAYS]-(s:streamer)
+RETURN g.name as game, count(s) as no_streamers
+ORDER BY no_streamers DESC
+LIMIT 10;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Section 4.3 find the squads associated with the most top streamers
+MATCH (s:streamer)
+WITH s 
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 10
+MATCH (sq:squad)<-[:member]-(s)
+RETURN sq.name as squad_name, count(*) as top_streamer_count
+ORDER BY top_streamer_count DESC;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Section 4.4 find the most common games among the top streamers
+// this can provide an isnight into what games are popular among the top streamers
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg DESC
+LIMIT 10
+MATCH (s)-[:plays]->(g:game)
+RETURN g.name as game, count(*) as top_streamer_count, collect(s.name)  as streamer_name
+ORDER BY top_streamer_count DESC;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Section 4.6 top 50 streamers based on average views
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 50
+
+MATCH path= (s)-[:plays]->(g:game)
+RETURN path as path
+
+UNION
+MATCH (s:streamer)
+WITH s 
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 50
+
+MATCH path = (s)-[:member]->(sq:squad)
+RETURN path as path
+
+UNION
+MATCH (s:streamer)
+WITH s 
+ORDER BY coalesce (s.views_avg,0) DESC
+LIMIT 50
+
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 50
+
+MATCH path = (s)-[:has_tag]->(t:tag)
+RETURN path as path;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Section 4.5 QUERY, IDENTIFYING FUTURE STARTS
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 20
+MATCH  path = (s)-[:member]->(sq:squad)<-[:member]-(s1:streamer)
+WHERE s<>s1
+RETURN path;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 4.6 section cross recommendations among top streamers
+MATCH (s1:streamer)
+WITH s1
+ORDER BY coalesce(s1.views_avg,0) DESC
+LIMIT 100
+WITH collect(s1.id) as top_100_popularity
+MATCH (s2:streamer)-[r1:recommends]->(s3:streamer)
+WHERE s2.id IN top_100_popularity AND s3.id IN top_100_popularity
+RETURN s2,r1,s3
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// blocked streamers and games they played
+MATCH path = (s:streamer)-[:plays]->(g:game)
+WHERE s.description IS NULL 
+RETURN path
+LIMIT 150
+UNION
+MATCH path = (s:streamer)-[:has_tag]->(t:tag)
+WHERE s.description IS NULL
+RETURN path;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// top streamers and top tag intersection
+MATCH (s:streamer)
+WITH s
+ORDER BY coalesce(s.views_avg,0) DESC
+LIMIT 50
+MATCH (t:tag)<-[tg:tagged]-(s)
+RETURN t,tg,s;
